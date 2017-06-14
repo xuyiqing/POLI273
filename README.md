@@ -13,5 +13,6 @@ Welcome to the couse website of POLI 273 Causal Inference. We are delighted to p
 * [Huchen Liu and Nhat-Dang Do](./2017spring/Liu_Do/Liu_Do.html)
 * [Luke Sanford anbd Rachel Schoner](./2017spring/Sanford_Schoner/Memo.html)
 * [Duy Trinh](./2017spring/Trinh/trinh.html)
+* [Shane Xuan](./2017spring/Xuan/xuan.html)
 
 
