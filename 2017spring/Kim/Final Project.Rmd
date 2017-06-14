@@ -1,0 +1,250 @@
+---
+title: 'Racial Identity and Foreign Policy Preferences: Survey Results from South
+  Korea'
+author: "DG Kim"
+date: "6/6/2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+# 1. Does Race Matter in Foreign Policy Public Opinion?
+Does racial identity have independent causal effects on the formation of public preferences and attitudes on foreign policies? Latest literature on political psychology and foreign policy public opinion has extensively dealt with a list of psychological and cognitive frames that the public relies on to form general foreign policy orientations. Such individual-level dispositions as the level of authoritarian outlooks and general level of trust, for example, have been consistently found to correlate with the support for general foreign policy directions such as _realpolitik_ and isolationist policies (Kertzer 2013; Kertzer & McGraw 2012; Rathbun 2008, 2009a, 2009b). Building upon this scholarship that increasingly highlights the role of psychological micro-foundations of foreign policy preferences (Kertzer 2017), this paper focuses on a novel psychological variable, racial identity, as a potential factor behind how the public forms attitudes toward regional and international relations of their nations. As a preliminary step toward systematic studies on how race in general matters in world politics (to be discussed briefly in concluding remarks below), this project tests whether higher inter-racial contact leads to stronger higher-order racial identities (i.e., Asian)^[Racial identity comprises a higher-order identity as it is regarded as overarching social categories distinct from ethnic and national identities.] and higher support for regional economic and political integration (i.e., Asian integration following the model of the EU).
+
+Specifically, I focus on the South Korean public's individual-level identification with Asian identity and  attitudes toward the foreign policy agenda of pan-Asian regional integration following the model of European Union. I use two waves of public opinion survey data conducted in 2005 and 2010. Both waves measured individual identification with Asian identity while only the 2010 survey measured respondents' support for a (exslucive) regional integration policy. To explain the heterogeneity at the individual level of racial identity among Korean publics, I examine whether a higher increase in the number of foreigners in each 16 administrative region of South Korea predicts the salience of Asian identity. The explanatory variable therefore consists of data on 16 city/provinces-level increase in the number of resident foreigners over 2 years prior to the date of each survey. I then check whether Asian identity is correlated with support for regional integration. The hypotheses therefore are as follows;
+
+__H1: Individuals living in a region with a higher increase in the number of resident foreigners over the 2 years prior to the survey are more likely to identify themselves strongly as Asians (Racial identity hypothesis).__
+
+__H2: Individuals living in a region with a higher increase in the number of resident foreigners over the 2 years prior to the survey are more likely to support the foreign policy agenda of Asian regional integration following the EU model (Regional integration hypothesis).__
+
+__H3: Individuals living in a region with a higher increase in the number of resident foreigners over the 2 years prior to the survey are more likely to support the idea of pursuing such models of regional integration without the involvement of the United States (Exclusive regional integration hypothesis).__
+
+# 2. Data & Empirical Strategy
+Two waves of public opinion surveys are pooled from the 2005 and 2010 Korean Identity Surveys conducted by Asiatic Research Institute of Korea University. Both waves contain measures of individual-level identification with Asian identity with the question worded as "How close do you identify with or feel toward the following groups?" (scales are as follows; 1: very high identification, 2: somewhat high, 3: not somewhat close, 4: not at all close, 9: NA). Unfortunately, only the 2010 (wave 2) survey included the module on attitudes toward the idea of pursuing regional integration in Asia and of working toward such strategy without the involvement of the United States. Therefore, as will be explained in detail below, fixed effects models will be applicable only to models testing the relationship between the increase in foreigners and individual-level Asian identity. Simple cross-sectional OLS and logistic regression models will be applied to testing the effects of both foreigner increases and Asian identity on foreign policy preferences.
+
+Additional variable "foreigner" is created by calculating the percentage of increasing numbers of registered foreigners for each of 16 administrative regions^[The 16 regions are given code numbers as follows; 1: Seoul, 2: Busan, 3: Daegu, 4: Incheon, 5: Gwangju, 6: Daejeon, 7: Ulsan, 8: Gyeonggi, 9: Gangwon, 10: Chungbuk, 11: Chungnam, 12: Jeonbuk, 13: Jeonnam, 14: Gyeongbuk, 15: Gyeongnam, 16: Jeju] of South Korea pooled from governmental data archives on immigration. Each percentage is calculated for over two-years periods prior to each wave of public opinion surveys. Identification strategies to test the above mentioned hypotheses are as follows;
+
+__${A_{t}} = \alpha + \beta*F_{it-1} + \gamma_{i} + \delta_{t} + \epsilon_{it}$                   (1)__
+
+
+where i indexes each 16 region and t indexes the time period (wave); ${A_{t}}$ is the level of Asian identity for each respondent; $\beta*F_{it-1}$ is the explanatory variable denoting the percentage of increase in foreigners registered at each region for over 2 years prior to each survey wave; $\gamma_{i}$ and $\delta_{t}$ are region and year fixed effects. Both OLS estimates and results with clustered standard errors are reported below in Table 1. The table also contains models with two-way fixed effects, quadratic year trends and unit specific time trends.
+
+Since the outcome measures of individual support for Asian regional integration are included only in the 2010 wave 2 survey, simple linear and logistic regression models without fixed effects are used as follows;
+
+__${R_{t}} = \alpha + \beta_{1}*F_{it-1} + \beta_{2}*A_{t} + \epsilon_{it}$                   (2)__
+
+
+
+where ${R_{t}}$ is the individual-level support for regional integration and exlusive regional integration; $\beta_{2}*A_{t}$ is used to measure if Asian identity correlates positively with support for regional integration.
+
+
+# 3. Results & Discussion
+
+```{r, include=FALSE}
+#install.packages("tidyverse")
+#install.packages("RefManageR")
+library(tidyverse)
+library(RefManageR)
+#biblio <- ReadZotero(user = <3166849>, .params = list(collection = '<collection_id>'))
+```
+
+```{r, include=FALSE}
+library(sandwich)
+library(stargazer)
+library(haven)
+data <- read_sav("2010.sav")
+data05 <- read_sav("2005.SAV")
+
+data$wave <- 2
+data05$wave <-1
+
+data$region <- data$Q12
+data05$region <- data05$Q17
+
+## Explanatory Variable Setup ## Percentage of increase in number of foreigners by 16 regions rounded to fist digit
+data$foreigner[data$region==1] <- -0.7
+data$foreigner[data$region==2] <- 0.4
+data$foreigner[data$region==3] <- -2.2
+data$foreigner[data$region==4] <- 0.3
+data$foreigner[data$region==5] <- 6.2
+data$foreigner[data$region==6] <- 2.6
+data$foreigner[data$region==7] <- 4.6
+data$foreigner[data$region==8] <- 5
+data$foreigner[data$region==9] <- -2.3
+data$foreigner[data$region==10] <- 2.5
+data$foreigner[data$region==11] <- 12.5
+data$foreigner[data$region==12] <- 4.3
+data$foreigner[data$region==13] <- 5.5
+data$foreigner[data$region==14] <- -0.4
+data$foreigner[data$region==15] <- 5.6
+data$foreigner[data$region==16] <- 9
+data$foreigner
+
+data05$foreigner[data05$region==1] <- 26
+data05$foreigner[data05$region==2] <- -1.4
+data05$foreigner[data05$region==3] <- -4.8
+data05$foreigner[data05$region==4] <- 1.9
+data05$foreigner[data05$region==5] <- 29.3
+data05$foreigner[data05$region==6] <- 21.8
+data05$foreigner[data05$region==7] <- 23.1
+data05$foreigner[data05$region==8] <- 0.7
+data05$foreigner[data05$region==9] <- 26.9
+data05$foreigner[data05$region==10] <- 17.8
+data05$foreigner[data05$region==11] <- 14.5
+data05$foreigner[data05$region==12] <- 20.5
+data05$foreigner[data05$region==13] <- 38.4
+data05$foreigner[data05$region==14] <- 9.9
+data05$foreigner[data05$region==15] <- 15.1
+data05$foreigner[data05$region==16] <- 39
+data05$foreigner
+
+
+# DVs for Wave 2 (2010 survey)
+data$asian <- data$Q16A6 # DV= 1: very high identification 2: somewhat high 3: not somewhat close 4: not at all 9: NA
+data$asian[data$asian==9] <-NA
+
+data$America <- data$Q76 # DV: 0-10 (higher: support for US alliance)
+data$ChinaThreat <- data$Q82A1  # DV: 1: high threat 2: somewhat threat 3: not threat at all 9:NA
+data$ChinaThreat[data$ChinaThreat==9] <-NA
+data$AU <- data$Q85 #DV: 1: yes 2: no. 9: NA
+data$AU[data$AU==9] <-NA
+data$AU[data$AU==1] <-0
+data$AU[data$AU==2] <-1
+
+
+data$ExclusiveAU <- data$Q86  #DV: 1: high support 2: support 3: oppose 4: high oppose 9: NA
+data$ExclusiveAU[data$ExclusiveAU==9] <-NA
+data$RacialReason[data$Q88==1] <-1  # DV: 1 means optimistic about Asian integration for racial homogeneity
+data$RacialReason[is.na(data$RacialReason)] <-0
+
+data$RacialReason
+
+# DVs for Wave 1 (2005 survey)
+data05$asian <- data05$Q24A6
+data05$asian[data05$asian==9] <-NA
+
+# Merging two waves
+wave2 <- as.data.frame(subset(data, select=c(wave, region, foreigner, asian, America, ChinaThreat, AU, ExclusiveAU, RacialReason)))
+wave1 <- as.data.frame(subset(data05, select=c(wave, region, foreigner, asian)))
+wave1$America <-NA
+wave1$ChinaThreat <-NA
+wave1$AU <-NA
+wave1$ExclusiveAU <-NA
+wave1$RacialReason <-NA
+total <- rbind(wave2, wave1)
+
+total$foreigner <- total$foreigner
+## OLS + Region fixed effects + Time fixed effects ##################################################
+summary(lm(total$asian ~ total$foreigner + factor(total$region) + factor(total$wave)), data=total)
+### Higher increase in foreigners is correlated with higher Asian identity in right direction
+####################################################################################################
+
+library(lmtest)
+library(dplyr)  #### dplyr (Kosher Way) is better in R
+
+
+cluster.se <- function(model, cluster){
+  require(sandwich)
+  require(lmtest)
+  M <- length(unique(cluster))
+  N <- length(cluster)
+  K <- model$rank
+  dfc <- (M/(M - 1)) * ((N - 1)/(N - K)) # degree of freedom correction
+  uj <- apply(estfun(model), 2, function(x) tapply(x, cluster, sum)) # sum e'X by cluster
+  rcse.cov <- dfc * sandwich(model, meat = crossprod(uj)/N) # put the meat inside breads
+  rcse.se <- coeftest(model, rcse.cov)
+  return(list(rcse.cov, rcse.se))
+}
+
+# Year and region fixed effects
+asian <- lm(asian ~ foreigner + factor(region) + factor(wave), data = total) ## without cluster, significance
+summary(asian)
+model1 <- cluster.se(asian,total$region[-asian$na.action])[[2]] ## with cluster, no significance
+
+# Time trend
+total$year_trend <-as.numeric(total$wave)
+asian2 <- lm(asian ~ foreigner + factor(region) + year_trend + I(year_trend^2), data = total) ## without cluster, significance
+model2 <- cluster.se(asian2,total$region[-asian2$na.action])[[2]] ## with cluster, no significance
+
+# Unit specific time trend
+asian3 <- lm(asian ~ foreigner + factor(wave) + year_trend*factor(region), data = total) ## without cluster, significance
+model3 <- cluster.se(asian2,total$region[-asian2$na.action])[[2]] ## with cl
+```
+
+Table 1 presents 6 models for estimates in formula (1). Models 1,2 and 3 respectively use two-way (region and wave) fixed effects, a quadratic year trend and two way fixed effects plus unit specific time trend. The other three models are the same models with clustered standard errors. Since the scale for Asian identity in both wave 1 and wave 2 are ordered such that 1 means highest identification up to 4 no identification at all, the coefficients for the variable foreinger in models 1,2 and 3 are correctly in negative directions with statistical significance. In other words, respondents in regions with higher increase in the number of foreigners over 2 years prior to the survey administration are more likely to identify themselves with Asian identity. Models 4,5 and 6 which use clustered standard errors, however, removes statistical significance from all models while the direction and size of coefficients remain the same.
+
+
+
+```{r, echo=FALSE}
+
+stargazer(type="text", asian, asian2, asian3, model1, model2, model3,
+          title="Table 1: Effect of Increase in Foreigners on Asian Identity", 
+          dep.var.labels =c("Without Clustered SE", "Results with Clustered SE"),
+          omit = c("region", "wave", "year_trend"),
+          omit.labels = c("Region FE", "Year FE", "Time Trend"),
+          keep.stat = c("n"), digits=2)
+```
+
+For estimates in formula (2), Table 2 below shows that support for regional integration is not found to be predicted by either the level of Asian identity or foreigner increase in both OLS and logistic regression models (models 1 and 2). On the outcome measure of support for regional integration without the United States, foreigner increase is found to be correlated with significance, but at a wrong direction. Models with clustered standard errors yield exact same results for all models.
+
+```{r, echo=FALSE, include=FALSE}
+#library(Hmisc)
+AU <-lm(total$AU ~ total$asian)  ## Not correlated
+summary(total$asian)
+
+model1 <- cluster.se(AU,total$region[-AU$na.action])[[2]] ## with cluster, no significance
+
+
+#corr(total$AU, total$asian)
+Exclusive <- lm(total$ExclusiveAU ~ total$asian + total$foreigner, data=total) ## Significant in wrong direction.
+AU2 <- glm(total$AU ~ total$foreigner, data=total, family=binomial) # Not significant
+summary(glm(total$AU ~ total$asian, data=total, family=binomial)) # Not significant
+summary(glm(total$RacialReason ~ total$foreigner, data=total, family=binomial)) # Not significant
+```
+
+
+```{r, echo=FALSE}
+stargazer(type="text", AU, AU2, Exclusive, title="Table 2: Effect of Asian Identity and Foreigner Increase on Support for Regional Integration", dep.var.labels =c("Support for Regional Integration", "Support for Integration w/o US"), keep.stat = c("n"), digits=2, notes = c("Note: Models 1-2 test the effect of asian identity and foreigner increase", " on support for regional integration. Model 3 tests their effects on support", " for regional integration that excludes the US."))
+
+```
+
+
+```{r, eval=FALSE, error=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+#Block Bootstrapping (CODE NOT WORKING####################)
+bootstrap <- function(total, reps=1000){
+  set.seed(05012017)
+  ATEs <- matrix(NA, nrow=reps, ncol=1)
+  for(i in 1:reps){
+    resample <- sample(total$region, length(total$region), replace=TRUE)
+    bootdata <- total[match(resample, total$region),]
+    asian <- lm(asian ~ foreigner + factor(region) + factor(wave), data = bootdata) ## without cluster, significance
+    ATEs[i,] <- summary(asian)$coefficients[2]
+  }
+  val <- apply(ATEs, 2, sd)
+  cat("The standard error of ATE is", val)
+  cat("\r\n The 95% bootstrap confidence interval is", sort(ATEs)[25], "-", sort(ATEs)[975])
+  cat("\r\n P-value is", table(ATEs<0)[2]/1000)
+}
+bootstrap(total, reps=1000)
+```
+
+# 4. Plans Ahead (Why Race in IR?)
+The data analyzed in this study are limited since surveys consist of only two waves such that here are limited within group variations to capture the effect of exogenous changes in the number of foreigners on individual racial identity. One possible alternative research design could look at the long-term effects of particular historical events or political institutions (possibly colonial Korea or South Korea under military dictatorships) on contemporary individual identification with Asian identity and foreign policy orientations. Such a study would be a contribution to the growing econometric studies on long-term effects of such seminal institutions as slavery on contemporary public opinions (Acharya, Blackwell, & Sen 2016). Most importantly, follow-up studies would attempt to uncover how racial versus ethnic identities affect contemporary public opinion in East Asia toward such important issues as policies toward rising China and relatedly, declining America.
+
+# Reference
+Acharya, A., Blackwell, M., & Sen, M. (2016). The Political Legacy of American Slavery. The Journal of Politics, 78(3), 621–641. https://doi.org/10.1086/686631
+
+Chao, M. M., Hong, Y., & Chiu, C. (2013). Essentializing race: Its implications on racial categorization. Journal of Personality and Social Psychology, 104(4), 619–634. https://doi.org/10.1037/a0031332
+
+Enos, R. D. (2014). Causal effect of intergroup contact on exclusionary attitudes. Proceedings of the National Academy of Sciences, 111(10), 3699–3704. https://doi.org/10.1073/pnas.1317670111
+
+Kertzer, J. D. (2013). Making Sense of Isolationism: Foreign Policy Mood as a Multilevel Phenomenon. The Journal of Politics, 75(1), 225–240. https://doi.org/10.1017/S0022381612000989
+
+Kertzer, J. D. (2017). Microfoundations in international relations. Conflict Management and Peace Science, 34(1), 81–97. https://doi.org/10.1177/0738894216665488
+
+Kertzer, J. D., & McGraw, K. M. (2012). Folk Realism: Testing the Microfoundations of Realism in Ordinary Citizens1: Folk Realism. International Studies Quarterly, 56(2), 245–258. https://doi.org/10.1111/j.1468-2478.2011.00715.x
+
+Rathbun, B. C. (2008). Does one right make a realist? Conservatism, neoconservatism, and isolationism in the foreign policy ideology of American elites. Political Science Quarterly, 123(2), 271–299.
+
+Rathbun, B. C. (2009). It takes all types: social psychology, trust, and the international relations paradigm in our minds. International Theory, 1(3), 345. https://doi.org/10.1017/S1752971909990121
+
+

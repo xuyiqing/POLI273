@@ -1,0 +1,60 @@
+---
+title: "Are Remittances Bad for Doing Business?"
+author: "Christina Cottiero"
+date: "June 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+```
+
+###Remittances are vitally important funds that migrant workers send back to family and friends in their home country, but they may also be fodder for corruption.
+
+Over the last decade, economists at development-focused institutions placed remittances at the center of a "new development mantra." Migrants' remittances of money and possibly democratic norms sparked hope that investment, economic growth and liberalization would soon arrive in lower-income countries.  
+	
+While initial assessments were mixed, recent papers emanating from the World Bank and IMF conclude that remittances have failed to deliver on their potential to generate macroeconomic growth or lift any countries out of poverty (Barajas et al 2009; Clemens and McKenzie 2017).  These pessimistic findings are consistent with recent works in political science which consider how remittances generate perverse micro-level incentives for policymakers in recipient countries, causing reduced public service provision and increasing corruption (Doyle 2015).  However, the puzzle of what has gone wrong with remittances in many countries has yet to be answered.
+	
+I propose that remittances have actually impacted the deeper institutional determinants of growth by retarding regulatory reforms.  My work asks: how does the injection of remittances in the domestic economy impact politicians' decisions regarding regulatory reform? Does the impact of remittances on political incentives differ from that of financial inflows we typically think of as easier for the government to capture, such as foreign aid or FDI?  Do remittances matter as an explanation of reform- or lack thereof?  
+	
+####Figure 1
+![](/Users/johnkuk/Downloads/Blog Post CI/schematic.png)
+
+
+I assume that politicians recognize that migrants have a much higher threshold for tolerating economic mismanagement than IFIs and- by extension- foreign multinationals have.  A patronage-driven government choosing its optimal level of business regulatory reform while keeping large sources of foreign capital- FDI, loans and remittances- in mind, therefore faces the following tradeoffs: streamlining regulatory policy may attract multinational corporations and lenders, but at the cost of reducing opportunities for political patronage.  Allowing bureaucratic corruption to continue unabated appeases core political supporters, but will almost certainly cause capital flight when it cuts into firms' profitability.  Conversely, the flow of remittances into the country will not diminish in order to penalize higher levels of bureaucratic corruption or economic mismanagement.  While migrants remit more frequently if the government streamlines regulatory policy, the government can strike a balance between patronage politics and attracting remittances that is not "all or nothing." In contrast, the government's choice with regards to FDI and bureaucratic corruption may resemble an all or nothing tradeoff when barriers to capital mobility are sufficiently low.
+
+I expect that lower-income countries which receive a greater proportion of remittances will face reduced incentives to streamline policies and procedures pertaining to business regulation, as they have a greater supply of low elasticity foreign exchange.  Therefore, ceterus paribus, we should expect to observe less progress in business regulatory reform in countries which receive large remittance inflows.  This lack of reform should be evidenced through a higher number of procedures required for businesses to complete basic tasks, such as their initial registration, as well as higher numbers of patronage jobs.  
+
+Additional procedures represent not only higher costs for businesses, but more opportunities for government bureaucrats to profit from the regulatory regime.
+
+**H1: Greater dependency on remittances allows politicians to maintain burdensome regulatory policies.**
+
+###Bringing in Data
+
+####Figure 2
+![](/Users/johnkuk/Downloads/Blog Post CI/missingoverall.png)
+
+Ideally, I would be able to present meaningful results upon running regression analyses of remittances on economic freedom, incorporating control variables, country fixed effects, and clustering standard errors at the country level.  However, testing my theory using existing cross-national data on remittances, business freedom and other control variables is unable to provide credible results for several reasons.  
+
+First of all, data is non-randomly missing from my panel.  The countries with the most intrusive governments and lower economic performance are the least likely to consistently provide data on critical variables such as remittance inflows.  When countries do provide data, that data varies in the extent to which it is measured with severe or more moderate error.  Data on remittance inflows tends to be underestimated, and the extent to which this occurs increases among countries where remittances are more likely to be sent through informal transfers, rather than banks.
+
+####Table 1
+![](/Users/johnkuk/Downloads/Blog Post CI/descriptivestat.png)
+
+Another issue is that remittance data is not consistently available prior to 2007, so my panel only covers 2007 to 2015.  This is an issue because business regulations are slow to change over time, and studying these would benefit from a panel extending further bank into the 1990s.  
+
+Nonetheless, it is clear that there is large variation in the extent to which low and lower-middle income countries depend on remittances as a proportion of GDP and source of foreign exchange.
+
+####Figure3
+![](/Users/johnkuk/Downloads/Blog Post CI/remitbycountry.png)
+
+While the relationship between remittance inflows and lower business freedom (as hypothesized) is not initially apparent from examining a two-way scatter plot, it is worth noting that each dot on the scatter plot represents a country-year unit.  Many of the clusters within the plots represent a single country over several years.  Idiosyncratic country differences make it tough to discern what relationship might exist.
+
+####Figure4
+![](/Users/johnkuk/Downloads/Blog Post CI/remitbusfree.png)
+
+###Next Steps
+
+In order to test my theory, I need to examine subnational data depicting the relationship between remittance inflows and economic freedom within a given country's regions.  One benefit is that any measurement error I encounter is more likely to be consistent within a single country as opposed to comparing across 83 countries.  I can also select my case to ensure that I have a much more complete panel, avoiding the missing data issues and list-wise deletion that was inherent to my cross-national analyses. 
+
+Thus far, I have collected remittance data from each of Mexico's states, as well as scores of the economic freedom in each Mexican state.  Hopefully, I will collect data on relevant co-variates at the state level in the near future in order to retest my theory. 

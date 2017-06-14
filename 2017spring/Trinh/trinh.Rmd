@@ -1,0 +1,130 @@
+---
+title: "Are anti-corruption agencies effective? It depends on how we measure it."
+author: "Duy Trinh"
+date: "June 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(knitr)
+library(markdown)
+library(plm)
+library(sandwich)
+library(lmtest)
+library(Amelia)
+library(Zelig)
+### Read data
+load("POLI273_ACA_data.RData")
+
+### Multiple overimputation
+priors <- matrix(c(c(1:nrow(data.impute)),rep(4,nrow(data.impute)), data.impute$wbgi_cce, data.impute$wbgi_ccs),
+                 ncol=4)
+priors <- subset(priors, !is.na(priors[,3]))
+overimp <- priors[,1:2]
+bounds <- matrix(c(4,-3,3), nrow=1)
+
+set.seed(0512)
+impute <- amelia(data.impute, ts="year", cs="cname", idvars=c("identifier", "makeaca","haveaca"), m=10, overimp=overimp, priors=priors, bounds=bounds,
+                 logs=c("wdi_gdppccon"), ords=c("p_polity2", "leaderage", "p_durable"),
+                 parallel="multicore", ncpus=5, p2s=1,
+                 incheck=TRUE, empri=0.05*nrow(data.impute))
+```
+
+If you happen to know a handful of the World Bank's anti-corruption experts, chances are you've heard one of them make reference to Hong Kong's Independent Commission against Corruption (ICAC). Created in 1974 when Hong Kong was still plagued by endemic corruption, it transformed the territory into one of the world's least corruption places (it ranks 12th in 2016, according to Transparency International's Corruption Perceptions Index (CPI)). 
+
+ICAC was undeniably successful. The same, however, could not be said of its successors. Since Hong Kong's experience, anti-corruption agencies (ACAs)—”separate, permanent agencies whose primary function is to provide centralized leadership in anti-corruption activity” (Meagher, 2005)—have become the latest fad within the international anti-corruption circle, and by 2012, at least 72 countries have had a form of ACAs or another. Yet it does not seem like these countries are all becoming remarkably less corrupt, nor do policy makers talk about these new agencies with as much enthusiasm as once given to the Hong Kong story. Instead, skepticism was widespread: In one particularly damning piece, Doig and Williams (2007) allege that “[ACAs] have, with one or two exceptions, been a disappointment both to the people of developing countries and to their development partners.” 
+
+But have they, really?
+
+##Challenges
+
+It is not as if nobody has tried evaluating these agencies before (see Quah (1999); Heilbrunn (2004); Sousa (2009)). Nonetheless, it seems no one has been able to surmount the identification challenges associated with measuring ACA's effectiveness. 
+
+First, there's the selection problem. ACAs do not pop up randomly: they are the outcomes of carefully calibrated decisions made by political leaders, to serve certain (potentially unobservable) serve political purposes. Without taking into account the context in which ACAs come into place, one might confuse the effect of that context for that of ACAs.
+
+Second, there's the measurement issue. When we say this and that policy innovation reduces corruption, what corruption are we talking about exactly? The literature differs widely as to what constitutes corruption, both conceptually and operationally. Some focus on individual acts e.g. bribery, others look at broader “symptoms,” [cite Johnston] still others take a bird's eye view and measure overall perception of corruption, arguing, perhaps, that whatever corruption is, one knows it when one sees it. With so many different yardsticks out there, confusion is inevitable: One country might be extremely corrupt according to one measure yet only moderately so or even clean according to another. 
+
+##Solution
+
+Perhaps the situation is truly hopeless. Still, I try anyway.
+
+To tackle the selection problem, I refer to my unpublished (and oh so problematic) seminar paper, in which I discover that the likelihood of ACA creation decreases the more time a new leader spends in office, and is NOT influenced by many common suspects (e.g. corruption level, membership in international organization, trade openess, etc.). The proposed (but untested) mechanism was that new leaders, who inherit a bureaucracy whose loyalty they cannot trust, introduce ACAs to sidestep bureaucratic entrenchment and consolidate power. 
+
+To address the measurement issue, I rely on the World Bank's Control of Corruption score. Like the popular CPI, it aggregates from multiple perception-based measures of corruption for each country in each year to produce a single point estimate, together with a pseudo-standard deviation to capture the level of disagreement between measures and data availability. The measure is chosen for its theoretical basis (something acknowledged even by its harsher critics), and importantly, for its attention to measurement uncertainty. 
+
+To make use of this information, I rely on the multiple overimputation approach, itself a generalization of multiple imputation (Blackwell et al., 2015). While multiple imputation is a method to correct for missing data by (1) imputing the missing cells repeated from the joint multivariate normal distribution of the entire dataset, (2) running the same regression for each imputation, and (3) aggregate results from all regressions, taking into account the error both within each regression and across regressions, multiple overimputation generalizes the framework to mismeasured data, by treating them as missing-with-priors. In this particular case, I use the Control of Corruption score's point estimate and its standard deviation as priors, and sample multiple sets of “overimputed” scores from both these prior distribution and the mutivariate normal distribution of the entire dataset.
+
+##The model
+
+Here, I use a fixed effects within estimator:
+$$Y_{it}=\alpha_{i}+\lambda_{t}+X_{it}\beta+T_{it}\delta+\epsilon_{it}$$
+where $\alpha_{i}$ is the country fixed effects, $\lambda_{t}$ is the year fixed effects, $X_{it}$ is the vector of control variables, and $T_{it}$ is the treatment status dummy, named haveace (1 after ACA creation and 0 before). The outcome $Y_{it}$ corresponds to the CoC score of country $i$ at year $t$.
+
+I run the model both with and without multiple overimputation, and cluster my standard error at country-level for non-multiply overimputed models. 
+
+##Results
+
+The non-multiply overimputed models are... confusing, to say the least. Without controls, the correlation between ACA presence and perceived control of corruption as measured by the Control of Corruption score is non-significant with country and two-ways FE, yet significantly negative with only year FE:
+
+```{r}
+# Bare models with no controls
+model1a <- plm(wbgi_cce ~ haveaca, data=data.impute, model="within", effect="individual", index=c("year","cname"))
+coeftest(model1a, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model1b <- plm(wbgi_cce ~ haveaca, data=data.impute, model="within", effect="time", index=c("year","cname"))
+coeftest(model1b, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model1c <- plm(wbgi_cce ~ haveaca, data=data.impute, model="within", effect="twoways", index=c("year","cname"))
+coeftest(model1c, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+
+```
+
+Once we introduce control variables that drive perceived corruption i.e. GDP per capita and Polity score, the correlation becomes much more precisely estimated. However, the sign of the correlation remains perplexing: ACAs are associated with better control of corruption in the country FE model, yet in the year FE model, it is negatively associated with perceived control of corruption. 
+
+```{r}
+# Control for vars that could affect corruption perception
+model2a <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2, effect="individual", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model2a, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model2b <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2, effect="time", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model2b, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model2c <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2, effect="twoways", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model2c, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+```
+
+The same pattern exists when we include control variables to account for selection issue: regime durability and leader's time in office. In whatever configuration, the conservative two-ways FE model shows no significant relationship.
+
+```{r}
+# Control for vars that could affect ACA selection
+model3a <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable, effect="individual", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model3a, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model3b <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable, effect="time", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model3b, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+model3c <- plm(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable, effect="twoways", data=data.impute, model="within", index=c("year","cname"))
+coeftest(model3c, vcov=function(x) vcovHC(x, cluster="group", type="HC1"))
+```
+
+We already see how different ways to measure ACA effect give rise to opposite findings. This, still, is when we wrongly assume perfectly measured outcome variable. As we remove that assumption and take measurement error into account using multiple overimputation, one would expect the results to become all non-significant (after all, isn't that what errors do to estimates?) However, the story seems a little more complicated:
+
+```{r}
+# Country FE, fullly saturated model
+zelig(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable + factor(cname),
+                 data=impute$imputations, model="ls")
+# Year FE, fullly saturated model
+zelig(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable + factor(year),
+                 data=impute$imputations, model="ls")
+# Two-ways FE, fullly saturated model
+zelig(wbgi_cce ~ haveaca + wdi_gdppccon + p_polity2 + leaderage + p_durable + factor(year) + factor(cname),
+                 data=impute$imputations, model="ls")
+```
+Now the effect of ACAs is actually marginally positive with country FE, and significantly negative with year FE!
+
+##So what does this all mean?
+
+For one, we are still unable to say with certainty whether ACA harms or hurts a country's perceived corruption level. 
+
+For another, perhaps this little exercise says a lot more about the state of the data and what we can and cannot answer, rather than anything about the actual answers themselves. Here, I show that it is actually possible to run a cross-national policy evaluation that takes into account confounders and selection issue. However, while such an attempt is feasible, it is not likely to be very interesting.
+
+Finally, and rather unexpectedly, there's something to be said about the changing signs of the estimated effects as we move from one estimation model to the other. While it is not unheard of to see time FE and individual FE returning widely different estimates, it is surprising that the multiple overimputation models would behave in opposite directions to the non-multiply overimputed models. As it turns out, mismeasured data do more than just attenuating and/or adding noise to our effect estimates: The exact nature of mismeasurement, as well as the way we deal with it does have substantively significant implications on the results we might get. 

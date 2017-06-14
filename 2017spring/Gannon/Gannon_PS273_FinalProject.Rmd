@@ -1,0 +1,330 @@
+---
+title: "Whither King Corn? How Government Cash Transfers Affect Tortilla Consumption Patterns in Mexico"
+author: "J Andres Gannon"
+date: "June 13, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pacman)
+p_load(foreign)
+p_load(haven)
+p_load(dplyr)
+p_load(data.table)
+p_load(Matching)
+p_load(Amelia)
+```
+
+```{r Data cleaning, eval = FALSE, include = FALSE}
+ENCASEH1998march <- read.spss("Data/socioec_encel_98m.sav", to.data.frame = TRUE)
+ENCASEH1998march <- dplyr::select(ENCASEH1998march, 
+                           Survey_form = folio, 
+                           Location_code = claveofi, 
+                           State = entidad, 
+                           Municipality = muni, 
+                           Locality = local, 
+                           Line_row = renglon, 
+                           Income = yycali, 
+                           Poverty_classification = pobre, 
+                           Sample = contba, 
+                           Tomato_pw = p034a01, 
+                           Onion_pw = p034a02, 
+                           Potato_pw = p034a03, 
+                           Carrots_pw = p034a04, 
+                           Leafvegetables_pw = p034a05, 
+                           Oranges_pw = p034a06, 
+                           Banana_pw = p034a07, 
+                           Apples_pw = p034a08, 
+                           Lemons_pw = p034a09, 
+                           Fruitvegmisc_pw = p034a10, 
+                           Tomato_how = p035a01, 
+                           Onion_how = p035a02, 
+                           Potato_how = p035a03, 
+                           Carrots_how = p035a04, 
+                           Leafvegetables_how = p035a05, 
+                           Oranges_how = p035a06, 
+                           Banana_how = p035a07, 
+                           Apples_how = p035a08, 
+                           Lemons_how = p035a09, 
+                           Fruitvegmisc_how = p035a10, 
+                           Fruitvegtotal_spent = p038a, 
+                           Chicken_pw = p034c01, 
+                           Pork_pw = p034c02, 
+                           Sheep_pw = p034c03, 
+                           Seafood_pw = p034c04, 
+                           Tunasardines_pw = p034c05, 
+                           Eggs_pw = p034c06, 
+                           Milk_pw = p034c07, 
+                           Lard_pw = p034c08, 
+                           Cupcakes_pw = p034d01, 
+                           Nonalcoholic_pw = p034d02, 
+                           Alcoholic_pw = p034d03, 
+                           TeaCoffee_pw = p034d04, 
+                           Sugar_pw = p034d05, 
+                           VegetableOil_pw = p034d06, 
+                           Chicken_how = p035c01, 
+                           Pork_how = p035c02, 
+                           Sheep_how = p035c03, 
+                           Seafood_how = p035c04, 
+                           Tunasardines_how = p035c05, 
+                           Eggs_how = p035c06, 
+                           Milk_how = p035c07, 
+                           Lard_how = p035c08, 
+                           Cupcakes_how = p035d01, 
+                           Nonalcoholic_how = p035d02, 
+                           Alcoholic_how = p035d03, 
+                           TeaCoffee_how = p035d04, 
+                           Sugar_how = p035d05, 
+                           VegetableOil_how = p035d06, 
+                           AnimalandOther_total = p038c, 
+                           CornTortillas_pw = p034b01, 
+                           FlourTortillas_pw = p034b02, 
+                           Wheat_pw = p034b03, 
+                           WhiteBread_pw = p034b04, 
+                           SweetBread_pw = p034b05, 
+                           BimboBread_pw = p034b06, 
+                           Wheatflour_pw = p034b07, 
+                           PastaSoup_pw = p034b08, 
+                           Rice_pw = p034b09, 
+                           Cookies_pw = p034b10, 
+                           Beans_pw = p034b11, 
+                           Cereal_pw = p034b12, 
+                           CornTortillas_how = p035b01, 
+                           FlourTortillas_how = p035b02, 
+                           Wheat_how = p035b03, 
+                           WhiteBread_how = p035b04, 
+                           SweetBread_how = p035b05, 
+                           BimboBread_how = p035b06, 
+                           Wheatflour_how = p035b07, 
+                           PastaSoup_how = p035b08, 
+                           Rice_how = p035b09, 
+                           Cookies_how = p035b10, 
+                           Beans_how = p035b11, 
+                           Cereal_how = p035b12, 
+                           Grains_total = p038b, 
+                           HomeMeals_pw = p040, 
+                           PplEatingOut_count = ep042, 
+                           SpentEatingOut_amount = p044, 
+                           SpentCooking_amount = p045)
+
+
+
+ENCASEH1998october <- read.spss("Data/socioec_encel_98o.sav",to.data.frame = TRUE)
+ENCASEH1998october <- dplyr::select(ENCASEH1998october, 
+                           Survey_form = folio, 
+                           Location_code = claveofi, 
+                           State = entidad, 
+                           Municipality = mpio, 
+                           Locality = local,
+                           Household_pop = r006, 
+                           Line_row = renglon, 
+                           Poverty_classification = pobre, 
+                           Sample = contba, 
+                           Extreme_poverty = pobextre, 
+                           CONAPO_marginalization_index = indice, 
+                           CONAPO_marginalization_degree = grado, 
+                           Densification_beneficiary_designation = es_densi, 
+                           Actual_beneficiacy = esb, 
+                           Locality_poverty = loc_pobr, 
+                           Tomato_pw = r12601, 
+                           Onion_pw = r12602, 
+                           Potato_pw = r12603, 
+                           Carrots_pw = r12604, 
+                           Leafvegetables_pw = r12605, 
+                           Oranges_pw = r12606, 
+                           Banana_pw = r12607, 
+                           Apples_pw = r12608, 
+                           Lemons_pw = r12609, 
+                           Chicken_pw = r12622, 
+                           Pork_pw = r12623, 
+                           Sheep_pw = r12624, 
+                           Seafood_pw = r12625, 
+                           Tunasardines_pw = r12626, 
+                           Eggs_pw = r12627, 
+                           Milk_pw = r12628, 
+                           Cheese_pw = r12629, 
+                           Lard_pw = r12630, 
+                           Cupcakes_pw = r12631, 
+                           Nonalcoholic_pw = r12632, 
+                           Alcoholic_pw = r12633, 
+                           TeaCoffee_pw = r12634, 
+                           Sugar_pw = r12635, 
+                           VegetableOil_pw = r12636, 
+                           CornTortillas_pw = r12611, 
+                           FlourTortillas_pw = r12612, 
+                           WhiteBread_pw = r12613, 
+                           SweetBread_pw = r12614, 
+                           BimboBread_pw = r12615, 
+                           Wheatflour_pw = r12616, 
+                           PastaSoup_pw = r12617, 
+                           Rice_pw = r12618, 
+                           Cookies_pw = r12619, 
+                           Beans_pw = r12620, 
+                           Cereal_pw = r12621, 
+                           HomeMeals_pw = r134, 
+                           PplEatingOut_count = r135, 
+                           SpentEatingOut_amount = r139, 
+                           SpentCooking_amount = r141)
+
+
+
+notBlank <- function(x)
+{
+  return(x[!is.na(x)][1])
+}
+
+df1 <- data.table(ENCASEH1998march)
+df1.sum <- df1[, lapply(.SD,notBlank), by = Survey_form]
+
+df2.sum <- data.table(ENCASEH1998october[!is.na(ENCASEH1998october$Household_pop),])
+
+df1.sum <- df1.sum[order(Location_code, Survey_form)]
+df2.sum <- df2.sum[order(Location_code, Survey_form)]
+
+index<-df1.sum$Survey_form %in% df2.sum$Survey_form
+sum(index)
+
+df <- merge(df1.sum, df2.sum, by = "Survey_form")
+
+df$CornTortillas_pw.dif <- df$CornTortillas_pw.y-df$CornTortillas_pw.x
+df$FlourTortillas_pw.dif <- df$FlourTortillas_pw.y-df$FlourTortillas_pw.x
+df <- df[!is.na(df$FlourTortillas_pw.dif),]
+df <- df[!is.na(df$CornTortillas_pw.dif),]
+df <- df[!is.na(df$Income),]
+temp<-rep(0,nrow(df))
+temp[as.character(df$Poverty_classification.x)=="Pobre"]<-1
+df$Poverty_classification.x<-temp
+temp<-rep(0,nrow(df))
+temp[as.character(df$Sample.x)=="Basal"]<-1
+df$Sample.x<-temp
+df <- df[df$Poverty_classification.x==1,]
+df$Income <- df$Income/100
+
+df<-dplyr::select(df, 
+                  `Household` =  Survey_form,
+                  `State` = State.x,
+                  `Municipality` = Municipality.x,
+                  `Locality` = Locality.x,
+                  `Flour Tortillas Consumed` = FlourTortillas_pw.x,
+                  `Flour Tortillas - Difference` = FlourTortillas_pw.dif,
+                  `Corn Tortillas Consumed` = CornTortillas_pw.x,
+                  `Corn Tortillas - Difference` = CornTortillas_pw.dif,
+                  Income, 
+                  `Poverty Classification` = Poverty_classification.x,
+                  Treatment = Sample.x)
+
+sum(df$Treatment==1)/nrow(df)
+```
+
+# Introduction
+In 1997, Mexico launched a new social protection program called Programa de Educaci\'{o}n, Salud y Alimentaci\'{o}n, or PROGRESA (now named Oportunidades), designed to alleviate poverty through the implementation of conditional cash transfers. The goal of the program was to reduce intergenerational poverty by creating incentives for poor families to participate in education and health programs in their communities. This paper analyzes the effect that these conditional cash transfers have had on household spending habits when it comes to food and nutrition.
+
+Eligibility for the PROGRESA program was determined in a few steps. First, information from the Mexican census was used to determine the poverty status of each village. A poverty index was created that identified the level of economic "marginality" of a village as well as that village's access to schools and health care centers (since attending schools and health care centers are conditions for receiving the cash transfer). To quality, a village had to have 50-2,500 inhabitants, score `high' on the marginality index, have a school, and be located less than 2 miles away from the nearest health care center.
+
+After that, household eligibility within these communities was determined. To be eligible, households could not be current recipients of any other welfare programs and were also classified as poor/not poor based on family size, education, occupation, etc. Households classified as poor were eligible for the program. Roughly 80% of families in eligible communities qualified and 97% of those signed up.
+
+320 of the eligible villages were randomly assigned to begin receiving benefits when the program started. The other 186 villages served as controls.
+
+As a condition of receiving the cash transfer every two months, the children in the household have to be currently attending school (at least 85% attendance measured every 2 months) and the mothers must maintain regular visits to the health clinic. The cash transfers from the program are administered bi-monthly and the amount varies based on the number of children in the household, age and grade level of the children, and number of persons in the household over the age of 70. In almost all cases, these cash transfers are substantial and can represent roughly one fifth of the household income (Behrman 2005).
+
+The PROGRESA program was phased in, meaning that over the course of the next few years all eligible households ended up receiving the conditional cash transfers. For the purpose of our paper, only the initial recipients of the cash transfers will be analyzed as the treatment group to make a comparison between them and the control group who received no cash transfers easier. Thus, the household level survey data from March and October of 1998 will be the primary sources for this project. The March 1998 data is a pre-treatment survey that gives demographic information about households eligible for the program as well as spending and consumption patterns. This allows us to control for differing pre-treatment levels and provides a basis for matching which will likely have to be used. The October 1998 data thus gives us the same dependent variable information roughly 7 months after conditional cash transfers were initialized.
+
+# Motivation
+Since the goal of PROGRESA has been to improve education and health outcomes in low-income communities, most research has focused on the program's effects in those regards (Angelucci 2009, Behrman 2011, De Janvry 2006,  Gertler 2004, Raymond 2003). Less work has looked ay PROGRESA to analyze the incidental effects of conditional cash transfers writ large on other aspects of life. While some work has been done on the relationship between conditional cash transfers and food security or consumption patterns, most of this work has been in the public health context and looked at changes in nutrition rather than spending (Davis 2002, Hoddinott 2000, Hoddinott 2008, Ruiz-Arranz 2002, Skoufias 2013).
+
+Food security and household spending on food are primary considerations in many developing countries. The PROGRESA program provides fertile ground for analyzing the relationship between income and food consumption patterns because it is a randomized control trial with a short time interval and fine-grained information about spending patterns on particular food items.
+
+Initially, this paper was hoping to examine the substitutability of foods like beef and chicken to see the role that prices played in changing spending patterns on these goods. The idea was that I could test whether beef is a luxury substitutable good relative to chicken by analyzing whether an exogenously determined income boost results in changing spending patterns between these goods.
+
+Given the limitation of our data, our motivation has since shifted. A different theory concerns the role of luxury goods and household staples when it comes to food security. Part of the motivation for tax returns in the US is that recipients of those tax returns will increase short-term consumption in ways that benefit the broader national economy. This contrasts with the belief that a short-term and temporary income boost motivates consumers to either pocket those increased funds as contributions to savings or to simply cushion their spending on primary goods they were planning on purchasing anyway (Ruiz-Arranz 2006).
+
+As a result, this paper looks at the effects of treatment (meaning receipt of PROGRESA randomly assigned cash transfers) on consumption of corn and flour tortillas. While I cannot ascertain the degree to which these goods are substitutes from one another, examining the difference in consumption rates on both of those goods is a useful first step in developing theories about the value of those goods. Whether spending increases on both of those items, has opposite effects on each item, or affects only one item sheds important light on the value that consumers place on these goods.
+
+# Methodology
+Since the distribution of conditional cash transfers was randomly assigned, we have a rare opportunity to analyze the data as a randomized controlled experiment. The effect of receiving the treatment on tortilla consumption will be analyzed using difference-in-differences estimation via linear regressions with a dummy variable for the control group. I am running a linear regression to find out the average treatment effect. I ran two models, one for flour tortillas and the other for corn tortillas:
+
+$$FlourTortillaDifference_i = \alpha + \beta_1 Treatment_i + Income_i + FlourTortillaConsumption_i + CornTortillaConsumption_i + Income*Treatment_i + \epsilon$$
+
+$$CornTortillaDifference_i = \alpha + \beta_1 Treatment_i + Income_i + FlourTortillaConsumption_i + CornTortillaConsumption_i + Income*Treatment_i + \epsilon$$
+
+The dependent variable, $XTortillaDifference_i$ refers to the change in tortilla consumption where $X$ represents either corn or flour tortillas. $Treatment_i$ is a dummy variable for whether or not the household received the treatment of randomized cash transfers. The other 4 variables are controls for initial levels of corn and flour tortilla consumption and income. The last of these, $Income*Treatment_i$, is an interaction term to examine how a 100 peso increase in income increases the effect of treatment. The law of large numbers explains why we do not need to worry about controlling for the other covariates in the dataset or pairing individual observations in the treatment and control group.
+
+After cleaning the original dataset, the dataset consisted of 10,818 observations, with roughly $\frac{2}{3}$ of these households being in the treatment group and the remaining $\frac{1}{3}$ in the control group.
+
+# Results and Analysis
+```{r, eval = FALSE, include = FALSE}
+p_load(stargazer)
+
+df <- as.data.frame(df)
+means_table <- aggregate(df[, 5:9], list(df$Household), mean)
+
+stargazer(means_table[, -1], report = "vct*", digits = 2, style = "apsr", title = "Table of Means (all data)", out = "LaTeX/means_table.tex")
+```
+
+![Summary Statistics](summarystats.png)
+
+Table 1 shows summary statistics for the key dependent variables. It includes both the overall number of tortillas consumed after treatment as well as the degree to which was an increase or decrease relative to consumption levels prior to treatment. This is measured as the number of days in the past week where tortillas were consumed. Income shows the range of income levels among all those who were eligible for the program, meaning they are all below the poverty threshold for program eligibility even if they did not receive treatment in the randomization process. Poverty classification and a dummy variable for treatment are also in the data, but have been omitted from the table of means because those means do not provide useful information.
+
+```{r, eval = FALSE, include = FALSE}
+#Examine income data to see threshold and variation
+p_load(ggplot2)
+ggplot(df[df$Treatment==1,], aes(x=Income)) +
+  geom_density()+
+  geom_density(data = df[df$Treatment==0,], aes(x=Income)) + 
+  labs(title = "Balance on Income", x = "Income", y = "Density")
+ggsave("income_threshold.png", path = "Graphs/")
+```
+
+![Income Threshold](income_threshold.png)
+
+Figure 1 above shows the income threshold and provides face validity about those who received treatment. It also gives us an idea of the distribution of income that was relevant for deciding program eligibility. The threshold for program eligibility, which was just below 700 pesos, is consistent with the most likely income levels.
+
+Figure 2 provides similar information regarding the breakdown of ``tortilla days" for both the treatment and control groups prior to the distribution of PROGRESA cash transfers. This shows that across both groups, there are higher levels of corn tortilla consumption than flour tortilla consumption with very few respondents reporting no corn tortilla consumption in the past week but roughly 15\% of respondents reporting no flour tortilla consumption in the past week.
+
+```{r, eval = FALSE, include = FALSE}
+#Bar plots of the distribution for both groups
+p_load(scales)
+p_load(plyr)
+
+df <- as.data.frame(df)
+df$flour_consumed <- df$`Flour Tortillas Consumed`
+df$corn_consumed <- df$`Corn Tortillas Consumed`
+df$Treatment <- as.factor(df$Treatment)
+
+ggplot(df, aes(x = flour_consumed, y=..count../sapply(fill, FUN = function(x) sum(count[fill == x])), fill = Treatment)) + geom_bar(stat = "count", position = position_dodge()) + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(breaks = pretty(df$corn_consumed, n = 7)) + labs(title = "Flour Tortilla Days per Week (%)", x = "Tortilla Days per Week", y = "Percent of Group")
+ggsave("flour_barplot.png", path = "Graphs/")
+
+ggplot(df, aes(x = corn_consumed, y=..count../sapply(fill, FUN = function(x) sum(count[fill == x])), fill = Treatment)) + geom_bar(stat = "count", position = position_dodge()) + scale_y_continuous(limits = c(0,1)) + scale_x_continuous(breaks = pretty(df$corn_consumed, n = 7)) + labs(title = "Corn Tortilla Days per Week (%)", x = "Tortilla Days per Week", y = "Percent of Group")
+ggsave("corn_barplot.png", path = "Graphs/")
+```
+
+![Corn Bar Plot](corn_barplot.png)
+
+![Flour Bar Plot](flour_barplot.png)
+
+Table 2 below shows the results from running the regression for both models. The first model shows the difference in flour tortilla consumption from receiving treatment and the second model shows the difference in corn tortilla consumption from receiving treatment.
+
+```{r, eval = FALSE, include = FALSE}
+#Run regressions
+model1 <- lm(formula = `Flour Tortillas - Difference` ~ Treatment + Income + `Flour Tortillas Consumed` + `Corn Tortillas Consumed` + Income * Treatment, df)
+model2 <- lm(formula = `Corn Tortillas - Difference` ~ Treatment + Income + `Flour Tortillas Consumed` + `Corn Tortillas Consumed` + Income * Treatment, df)
+
+stargazer(model1, model2, style = "apsr", title = "Regression Output", out = "LaTeX/reg_output.tex")
+stargazer(model1, model2, style = "apsr", title = "Regression Output", out = "Presentation/reg_output.tex")
+```
+
+![Regression Results](regression.png)
+
+The constant here is the baseline level of consumption for each type of tortilla. The difference in tortilla consumption is calculated as the difference between post-treatment amount and pre-treatment amount such that positive values indicate an increase in consumption over time and negative values indicate a decrease.
+
+The results of the regression shows that conditional cash transfers from PROGRESA are associated with an increase in flour tortilla consumption at p $<$ 0.01. This controls for prior flour and corn tortilla consumption. There is a smaller effect for income because it was a criteria for program eligibility. By comparison, for corn tortillas there is smaller (one third the magnitude of flour tortillas), negative change in consumption associated with treatment, and it is significant at p $<$ 0.1. In brief, an effect of receiving conditional cash transfers is a slight decrease in corn tortillas consumed. Change in corn tortilla consumption remains stable, regardless of household income. This could mean that current corn tortilla consumption patterns are already near the ceiling of maximum desired consumption or that money is being shifted to other goods. It could also be that the price of corn tortillas is such that more income is not needed to achieve desired consumption levels. More work would be needed to hypothesize about the reason for this lack of change. 
+
+The large and significant coefficient for baseline flour/corn tortilla consumption demonstrates that those with high initial consumption rates generally reduced their rate of consumption over the time period.
+
+Treatment has a (higher/lower) effect on households with (lesser/greater) income. This could indicate that flour tortillas are a normal good that is consumed more as household income increases while corn tortillas are in inferior good.
+
+# Conclusion
+This blog post has analyzed the relationship between PROGRESA conditional cash transfers and consumption patterns in Mexican households that were randomly selected to receive treatment. Since one of the primary purposes of this program was to positively influence health and nutrition outcomes, looking at the program's potential effects on consumption patterns has particularly important policy implications for public health and government spending.
+
+Although the scope of this paper is limited, looking at only two particular goods and over the course of a few months, it sets the stage for future work and raises important questions. Regression analysis provides useful information about changes in consumption patterns associated with treatment while controlling for current consumption patterns and income. Secondly, although I could not examine whether or not there was a trade-off between corn and flour tortilla consumption in a way that would shed light on good substitutability, the fact that our results show different changes for both kinds of tortillas demonstrates that this type of analysis may prove fruitful.
