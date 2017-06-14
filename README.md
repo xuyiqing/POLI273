@@ -12,6 +12,8 @@ We are delighted to present class preojects by our students.
 
 ### 2017 Spring
 
+[Syllabus](./2017spring/syllabus_273_17.pdf)
+
 * [Christina Cottiero](./2017spring/Cottiero/blogci.html)
 * [Lucas de Abreu Maia and Mariana Carvalho](./2017spring/dAM_Carvalho/CI-post.html)
 * [J Andres Gannon](./2017spring/Gannon/Gannon_PS273_FinalProject.html)
