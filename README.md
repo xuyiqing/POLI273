@@ -1,18 +1,36 @@
 ## Welcome to POLI 273
 
-Welcome to the couse website of POLI 273 Causal Inference. In this
+Welcome to the course website of POLI 273 "Causal Inference." In this
 course, we survey most commonly used empirical tools for political
 science and public policy research. Our focus is design-based causal
 inference, that is, to use statistical methods to answer research
 questions that concern the impact of some cause on certain outcomes.
 
-We are delighted to present class preojects by our students.
+We are delighted to present class projects by our students.
+
+[Syllabus](./2017spring/syllabus_273_17.pdf)
 
 ---
 
+### 2018 Spring
+
+* [Marco Alcocer](./2018winter/Alcocer.html)
+* [Micah Farver and Leo Falabella](./2018winter/Falabella_and_Farver.html)
+* [Thomas Flaherty](./2018winter/Flaherty.html)
+* [Lauren Gilbert](./2018winter/Lauren_Gilbert.html)
+* [Jessica Kim (Rady)](./2018winter/Jessica_Kim.html)
+* [Mac Lockhart and Rachel Skillman](./2018winter/Lockhart_Skillman.html)
+* [Ke Nie and Bolun Zhang (Sociology)](./2018winter/Nie_Zhang.html)
+* [Hernan Picatto](./2018winter/Picatto.html)
+* [Cassidy Reller](./2018winter/Cassidy_Reller.html)
+* [Nick Smith and Nathan Mariano](./2018winter/Smith_Mariano.html)
+* [Raduan van Velthem Meira](./2018winter/Raduan.html)
+* [Jiewen Xiao (Undergrad)](./2018winter/Jiewen_Xiao.html)
+* [Leo Yang](./2018winter/Leo_Yang.html)
+
+
 ### 2017 Spring
 
-[Syllabus](./2017spring/syllabus_273_17.pdf)
 
 * [Christina Cottiero](./2017spring/Cottiero/blogci.html)
 * [Lucas de Abreu Maia and Mariana Carvalho](./2017spring/dAM_Carvalho/CI-post.html)
