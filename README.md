@@ -12,7 +12,7 @@ We are delighted to present class projects by our students.
 
 ---
 
-### 2018 Spring
+### 2018 Winter
 
 * [Marco Alcocer](./2018winter/Alcocer.html)
 * [Micah Farver and Leo Falabella](./2018winter/Falabella_and_Farver.html)
